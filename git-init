@@ -1,0 +1,24 @@
+#!/bin/bash
+
+dir=`pwd`
+name=$1
+if [ -z $2 ]; then
+  origin="git@github.com:sholland/$name.git"
+  if [[ $1 =~ (vcenter|vshield|vmware_lib) ]]; then
+    upstream="git@github.com:vmware/$name.git"
+    name=`echo $name | sed 's/vmware-//'`
+    upstream_name=vmware
+  else
+    upstream="git@github.com:VMop/$name.git"
+    upstream_name=vmop
+  fi
+else
+  origin=$2
+  upstream=$3
+fi
+echo "upstream = $upstream"
+echo "name = $name"
+
+[ -d $dir/$name ] || mkdir $dir/$name
+
+cd $dir/$name && git init && git remote add sholland $origin && git remote add $upstream_name $upstream && git pull $upstream_name master && git checkout -b temp && git branch -D master && git fetch $upstream_name && git checkout -b master -t $upstream_name/master && git branch -D temp
